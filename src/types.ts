@@ -1,6 +1,6 @@
 // src/types.ts
 // Define a Task Model
-export interface Task{
+export interface Task {
     id: Number
     title: String
     description: String

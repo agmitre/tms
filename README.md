@@ -1,65 +1,69 @@
-# Project Overview
+# React + TypeScript + Vite
 
-## Project Description
-This is a task management system application built using React with Vite as the build tool and Tailwind CSS for styling.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Tools Used
-- **React**: JavaScript library for building user interfaces.
-- **Vite**: Build tool that aims to provide a faster and leaner development experience for modern web projects.
-- **Tailwind CSS**: Utility-first CSS framework for rapidly building custom designs.
+Currently, two official plugins are available:
 
-## App Guidelines
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-1. **Components**:
-   - All components should be modular and reusable.
-   - Components should follow the Single Responsibility Principle (SRP).
+## Expanding the ESLint configuration
 
-2. **Styling**:
-   - Use Tailwind CSS classes to style components.
-   - Avoid inline styles unless necessary.
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-3. **State Management**:
-   - Use React's built-in state management for simple applications.
-   - For more complex applications, consider using a state management library like Redux or Context API.
+```js
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-4. **Navigation**:
-   - Implement navigation using React Router or Vite's routing capabilities.
+      // Remove tseslint.configs.recommended and replace with this
+      ...tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      ...tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      ...tseslint.configs.stylisticTypeChecked,
 
-5. **Testing**:
-   - Write unit tests for components and hooks using Jest and React Testing Library.
-   - Ensure full coverage of your application.
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
 
-6. **Code Formatting**:
-   - Use Prettier for consistent code formatting.
-   - Configure Prettier to work with ESLint for linting.
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-7. **Version Control**:
-   - Commit changes with descriptive messages.
-   - Follow Git best practices, such as feature branches and pull requests.
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-8. **Documentation**:
-   - Document all public APIs and components.
-   - Use JSDoc for JavaScript documentation.
-
-## Getting Started
-
-1. Clone the repository to your local machine:
-   ```bash
-   git clone https://github.com/your-repo/task-manager.git
-   cd task-manager
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-4. Open your browser and navigate to `http://localhost:3000` to see the application in action.
-
-## License
-This project is licensed under the MIT License.
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
