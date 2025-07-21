@@ -41,25 +41,31 @@ This is a task management system application built using React with Vite as the 
    - Document all public APIs and components.
    - Use JSDoc for JavaScript documentation.
 
-## Getting Started
+9. **Updating the Guide**:
+   - Verify and update the guide after each update or change to the application.
 
-1. Clone the repository to your local machine:
-   ```bash
-   git clone https://github.com/your-repo/task-manager.git
-   cd task-manager
-   ```
+## Roadmap / Task Control
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+- [ ] Design System (UI Kit)
+  - [ ] Create color palette
+  - [ ] Establish typography guidelines
+  - [ ] Define spacing rules
 
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
+- [ ] Authentication
+  - [ ] Implement login functionality
+  - [ ] Implement registration functionality
+  - [ ] Add password reset feature
 
-4. Open your browser and navigate to `http://localhost:3000` to see the application in action.
+- [ ] Task Management
+  - [ ] Create task list component
+  - [ ] Implement task creation form
+  - [ ] Add edit and delete functionality for tasks
+  - [ ] Implement search and filter options
+
+- [ ] Dashboard
+  - [ ] Design and implement the dashboard layout
+  - [ ] Display user-specific data
+  - [ ] Provide visualizations (e.g., charts, graphs)
 
 ## License
 This project is licensed under the MIT License.
