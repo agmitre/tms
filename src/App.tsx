@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import "./index.css";
 
@@ -6,16 +6,17 @@ import type { Task } from "./types";
 import TaskList from "./components/TaskList";
 import TaskForm from "./components/TaskForm";
 import FilterBar from "./components/FilterBar";
-import { dummyTasks } from "./data/dummyTasks";
+import { loadTasks, saveTasks } from "./lib/taskService";
+import DarkModeToggle from "./components/DarkModeToggle";
 
 export default function App() {
-  const [tasks, setTasks] = useState<Task[]>(dummyTasks);
-  const [filterStatus, setFilterStatus] = useState<
-    "all" | "pending" | "completed"
-  >("all");
-  const [filterPriority, setFilterPriority] = useState<
-    "all" | "low" | "medium" | "high"
-  >("all");
+  const [tasks, setTasks] = useState<Task[]>(() => loadTasks());
+  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "completed">("all");
+  const [filterPriority, setFilterPriority] = useState<"all" | "low" | "medium" | "high">("all");
+
+  //Save tasks to localStorage on every change
+  useEffect(() => { saveTasks(tasks); }, [tasks]);
+
 
   const addTask = (newTask: Task) => {
     setTasks((prev) => [...prev, newTask]);
@@ -46,10 +47,12 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 p-8 max-w-2xl mx-auto">
-      <h1 className="text-4xl font-bold mb-6">Task Management App 📃</h1>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white p-8 max-w-2xl mx-auto">
+      <h1 className="text-4xl font-bold mb-6">Task Manager 📃
+        <DarkModeToggle />
+      </h1>
       <TaskForm onAdd={addTask} />
-      <h2 className="text-xl font-bold text-gray-800 mt-4 mb-4">My Tasks</h2>
+      <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mt-4 mb-4">My Tasks</h2>
       <FilterBar
         filterStatus={filterStatus}
         filterPriority={filterPriority}

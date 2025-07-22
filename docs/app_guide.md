@@ -15,6 +15,7 @@ This is a task management system application built using React with Vite as the 
 1. **Components**:
   - All components should be modular and reusable.
   - Components should follow the Single Responsibility Principle (SRP).
+  - **Badge Component**: A reusable badge component that can be used to display text with various colors and styles.
 
 2. **Styling**:
   - Use Tailwind CSS classes to style components.
@@ -64,7 +65,7 @@ This is a task management system application built using React with Vite as the 
  - [x] Mark tasks as completed (checkbox toggle)
  - [x] Delete a task
  - [x] Filter or sort tasks (e.g., by priority, due date, or status)
- - [ ] Store tasks in localStorage (before backend integration)
+ - [X] Store tasks in localStorage (before backend integration)
  - [ ] Implement task editing functionality
 
 - [ ] Dashboard
@@ -72,7 +73,18 @@ This is a task management system application built using React with Vite as the 
  - [ ] Display user-specific data
  - [ ] Provide visualizations (e.g., charts, graphs)
 
+- [x] Dark Mode Implementation
+  - [X] Add dark mode toggle functionality to the application.
+  - [X] Apply dark mode styles using Tailwind CSS.
+
+- [x] Local Storage Integration
+  - [x] Ensure local storage is working for storing tasks.
+  - [x] Add functionality to save and load tasks from local storage.
+
 ## Additional Features Completed
 - [x] A clean filter bar built with shadcn/ui
 - [x] Filtered display of tasks by status and priority
 - [x] A “Clear Filters” button
+- [x] Global badge component for reducing code size
+- [x] LocalStorage integration for testing
+

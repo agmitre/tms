@@ -31,12 +31,12 @@ export default function TaskForm({ onAdd }: Props) {
         onAdd(newTask);
         setTitle('');
         setDescription('');
-        setDueDate('');
+        setDueDate(new Date().toISOString().split('T')[0]);
         setPriority('low');
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow-md max-w-xl mx-auto">
+        <form onSubmit={handleSubmit} className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md max-w-xl mx-auto">
             <Input
                 type="text"
                 placeholder="Task Title"
@@ -52,7 +52,7 @@ export default function TaskForm({ onAdd }: Props) {
             </Textarea>
             <Input
                 type="date"
-                value={dueDate ?? new Date().toISOString().split('T')[0]}
+                value={dueDate || new Date().toISOString().split('T')[0]}
                 onChange={(e) => setDueDate(e.target.value)}>
             </Input>
             <Select
