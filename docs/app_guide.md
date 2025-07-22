@@ -8,6 +8,7 @@ This is a task management system application built using React with Vite as the 
 - **Vite**: Build tool that aims to provide a faster and leaner development experience for modern web projects.
 - **Tailwind CSS**: Utility-first CSS framework for rapidly building custom designs.
 - **Shadcn-ui**: UI component library for React.
+- **Lucide-icons**: Icon library for React applications.
 
 ## App Guidelines
 
@@ -62,21 +63,16 @@ This is a task management system application built using React with Vite as the 
  - [x] Implement task creation form
  - [x] Mark tasks as completed (checkbox toggle)
  - [x] Delete a task
- - [ ] Filter or sort tasks (e.g., by priority, due date, or status)
+ - [x] Filter or sort tasks (e.g., by priority, due date, or status)
  - [ ] Store tasks in localStorage (before backend integration)
  - [ ] Implement task editing functionality
-
 
 - [ ] Dashboard
  - [ ] Design and implement the dashboard layout
  - [ ] Display user-specific data
  - [ ] Provide visualizations (e.g., charts, graphs)
 
-## License
-This project is licensed under the MIT License.
-
- - [ ] Provide visualizations (e.g., charts, graphs)
-
-## License
-This project is licensed under the MIT License.
-
+## Additional Features Completed
+- [x] A clean filter bar built with shadcn/ui
+- [x] Filtered display of tasks by status and priority
+- [x] A “Clear Filters” button

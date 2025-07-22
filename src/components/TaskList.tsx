@@ -1,6 +1,9 @@
 import type { Task } from "../types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import PriorityBadge from "./ui/PriorityBadge";
+import DueBadge from "./ui/DueBadge";
+import StatusPill from "./ui/StatusPill";
 
 interface Props {
   tasks: Task[];
@@ -10,44 +13,62 @@ interface Props {
 
 export default function TaskList({ tasks, onToggleComplete, onDelete }: Props) {
   if (tasks.length === 0) {
-    return <p className="text-gray-500">No Tasks yet. Add one above!</p>;
+    return (
+      <p className="text-gray-500 text-center">No tasks yet. Add one above!</p>
+    );
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-bold mb-4">My Tasks</h1>
-      {tasks.map((task: Task) => (
+    <div className="space-y-6">
+      {tasks.map((task) => (
         <div
-          key={task.id.toString()}
-          className="rounded-2xl p-4 mb-2 bg-white shadow"
+          key={task.id}
+          className="bg-white rounded-2xl shadow p-5 flex flex-col gap-4 hover:shadow-lg transition-shadow"
         >
           <div className="flex items-start gap-4">
             <Checkbox
               checked={task.completed}
               onCheckedChange={() => onToggleComplete(task.id)}
+              className="mt-1"
             />
-            <div>
-              <h2 className="font-semibold">{task.title}</h2>
-              <p className="mb-4">{task.description}</p>
-              <p className="text-sm text-gray-500">
-                Due: {new Date(task.dueDate).toLocaleDateString()}
-              </p>
-              <p
-                className={`${
-                  task.priority === "high"
-                    ? "text-red-500"
-                    : task.priority === "medium"
-                    ? "text-yellow-500"
-                    : "text-green-500"
+
+            <div className="flex-1">
+              <h3
+                className={`text-lg font-semibold ${
+                  task.completed
+                    ? "line-through text-gray-400"
+                    : "text-gray-900"
                 }`}
               >
-                Priority: {task.priority.toLocaleUpperCase()}
+                {task.title}
+              </h3>
+              <p
+                className={`${
+                  task.completed
+                    ? "line-through text-gray-400"
+                    : "text-gray-700"
+                }`}
+              >
+                {task.description}
               </p>
+
+              <div className="mt-2 text-sm text-gray-500">
+                <DueBadge dueDate={task.dueDate} completed={task.completed} />
+                <PriorityBadge priority={task.priority} />
+                <StatusPill completed={task.completed} />
+              </div>
             </div>
           </div>
-          <Button variant="destructive" onClick={() => onDelete(task.id)}>
-            Delete
-          </Button>
+
+          <div className="flex justify-end">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => onDelete(task.id)}
+            >
+              Delete
+            </Button>
+          </div>
         </div>
       ))}
     </div>
