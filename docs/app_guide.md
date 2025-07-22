@@ -60,10 +60,13 @@ This is a task management system application built using React with Vite as the 
 - [x] Task Management
  - [x] Create task list component (dummy data)
  - [x] Implement task creation form
- - [ ] Mark tasks as completed (checkbox toggle)
- - [ ] Delete a task
+ - [x] Mark tasks as completed (checkbox toggle)
+ - [x] Delete a task
  - [ ] Filter or sort tasks (e.g., by priority, due date, or status)
  - [ ] Store tasks in localStorage (before backend integration)
+ - [ ] Implement task editing functionality
+
+
 - [ ] Dashboard
  - [ ] Design and implement the dashboard layout
  - [ ] Display user-specific data
