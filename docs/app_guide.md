@@ -84,7 +84,11 @@ This is a task management system application built using React with Vite as the 
 ## Additional Features Completed
 - [x] A clean filter bar built with shadcn/ui
 - [x] Filtered display of tasks by status and priority
-- [x] A “Clear Filters” button
+- [x] A "Clear Filters" button
 - [x] Global badge component for reducing code size
 - [x] LocalStorage integration for testing
 
+## New Features Added
+- **Expandable Form**: Add functionality to expand the task creation form when typing starts in the input field.
+- **Automatic Text Field Focus on Typing**: Automatically focus on the task creation input field when starting to type.
+- **Filter Bar Integration**: Integrated a filter bar using the PopOver component from Shadui for filtering tasks by status and priority.
