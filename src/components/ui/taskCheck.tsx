@@ -1,9 +1,10 @@
 import { useState } from "react"
 import { Check } from "lucide-react"
+import type { TaskStatus } from "@/types/types"
 
 interface TaskCheckProps {
     completed: boolean
-    status: "overdue" | "today" | "due" | "archived"
+    status: TaskStatus
     onToggleComplete: () => void
 }
 

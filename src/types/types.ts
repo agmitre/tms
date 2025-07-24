@@ -10,3 +10,11 @@ export interface Task {
     completed: boolean
     archived: boolean
 }
+
+export interface TaskDateInfo {
+    status: TaskStatus // today, overdue, due, archived
+    daysDiff: number
+    timeframe: string
+}
+
+export type TaskStatus = "today" | "overdue" | "due" | "archived" 

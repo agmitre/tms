@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import type { Task } from "../types";
+import type { Task } from "../types/types";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -27,12 +27,12 @@ export default function TaskForm({ onAdd }: Props) {
         if (!title.trim()) return;
         const newTask: Task = {
             id: Date.now(),
-            title,
-            description,
+            title: title.charAt(0).toUpperCase() + title.slice(1),
+            description: description && description.charAt(0).toUpperCase() + description.slice(1),
             dueDate,
+            createdDate: Date.now().toString(),
             priority,
             completed: false,
-            createdDate: new Date().toISOString(),
             archived: false
         };
         onAdd(newTask);
@@ -95,16 +95,16 @@ export default function TaskForm({ onAdd }: Props) {
                         setTitle(e.target.value);
                         if (!expanded) setExpanded(true);
                     }}
-                    className="mb-2"
+
                 />
                 <Button variant="outline" size="icon" onClick={() => setExpanded(!expanded)}>{expanded ? <ChevronsDownUp /> : <ChevronsUpDown />}</Button>
             </div>
 
-            {showHelper && !expanded && title.trim() === "" && (
+            {showHelper && !expanded && (
                 <p className="text-sm text-muted-foreground mb-2">Start typing to add a task</p>
             )}
             <div
-                className={`grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden transition-all duration-300 ${expanded ? "max-h-[500px] opacity-100 mt-2" : "max-h-0 opacity-0"
+                className={`pt-2 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden transition-all duration-300 ${expanded ? "max-h-[500px] opacity-100 mt-2" : "max-h-0 opacity-0"
                     }`}
             >
                 <Textarea
