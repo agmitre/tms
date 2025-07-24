@@ -1,3 +1,4 @@
+//docs/app_guide.md
 # Project Overview
 
 ## Project Description
@@ -87,6 +88,9 @@ This is a task management system application built using React with Vite as the 
 - [x] A "Clear Filters" button
 - [x] Global badge component for reducing code size
 - [x] LocalStorage integration for testing
+- [x] Implemented a custom taskCheck component.
+- [x] Implemented a magic feedback when task is completed
+- [x] Implemented archive function
 
 ## New Features Added
 - **Expandable Form**: Add functionality to expand the task creation form when typing starts in the input field.

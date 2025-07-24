@@ -29,10 +29,19 @@ export default function App() {
   const toggleTask = (id: number) => {
     setTasks((prev) =>
       prev.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
+        task.id === id ? { ...task, completed: !task.completed, archived: !task.completed } : task
       )
     );
   };
+
+  const archiveTask = (id: number) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id ? { ...task, archived: !task.archived } : task
+      )
+    );
+  };
+
 
   const deleteTask = (id: number) => {
     setTasks((prev) => prev.filter((task) => task.id !== id));
@@ -51,7 +60,7 @@ export default function App() {
   });
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white transition-all duration-300 ease-in-out">
+    <div className="bg-gray-300 dark:bg-gray-900 text-gray-900 dark:text-white transition-all duration-300 ease-in-out">
       <div className="min-h-screen p-8 max-w-2xl mx-auto ">
         <div className="flex justify-between mb-6">
           <h1 className="text-4xl font-bold">Task Manager 📃</h1>
@@ -84,7 +93,7 @@ export default function App() {
           tasks={filteredTasks}
           onToggleComplete={toggleTask}
           onDelete={deleteTask}
-        />
+          onArchive={archiveTask} />
       </div>
     </div>
   );

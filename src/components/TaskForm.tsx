@@ -13,10 +13,11 @@ interface Props {
 export default function TaskForm({ onAdd }: Props) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [dueDate, setDueDate] = useState(() => new Date().toISOString().split("T")[0]);
+    const [dueDate, setDueDate] = useState("");
     const [priority, setPriority] = useState<"high" | "medium" | "low">("low");
     const [expanded, setExpanded] = useState(false);
     const [showHelper, setShowHelper] = useState(false);
+
 
     const containerRef = useRef<HTMLFormElement>(null);
     const titleRef = useRef<HTMLInputElement>(null);
@@ -31,11 +32,13 @@ export default function TaskForm({ onAdd }: Props) {
             dueDate,
             priority,
             completed: false,
+            createdDate: new Date().toISOString(),
+            archived: false
         };
         onAdd(newTask);
         setTitle("");
         setDescription("");
-        setDueDate(new Date().toISOString().split("T")[0]);
+        setDueDate("");
         setPriority("low");
         setExpanded(false);
         setShowHelper(false);
@@ -44,16 +47,19 @@ export default function TaskForm({ onAdd }: Props) {
     // Global typing detection
     useEffect(() => {
         const handleGlobalKey = (e: KeyboardEvent) => {
+            const isTextInput = document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement;
+
+            // Only act if we're not already typing in an input/textarea
             if (
-                document.activeElement !== titleRef.current &&
+                !isTextInput &&
                 e.key.length === 1 &&
                 !e.metaKey &&
                 !e.ctrlKey &&
                 !e.altKey
             ) {
-                e.preventDefault();
                 setExpanded(true);
                 setShowHelper(true);
+                // Focus but DO NOT preventDefault (let key be typed)
                 titleRef.current?.focus();
             }
         };
@@ -134,3 +140,4 @@ export default function TaskForm({ onAdd }: Props) {
         </form>
     );
 }
+

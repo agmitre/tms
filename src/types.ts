@@ -5,6 +5,8 @@ export interface Task {
     title: string
     description: string
     dueDate: string // ISO date
+    createdDate: string // ISO date
     priority: 'low' | 'medium' | 'high'
     completed: boolean
+    archived: boolean
 }
