@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Check } from "lucide-react"
-import type { TaskStatus } from "@/types/types"
+import { TaskStatusColor, type TaskStatus } from "@/types/types"
 
 interface TaskCheckProps {
     completed: boolean
@@ -26,10 +26,10 @@ export default function TaskCheck({
     }
 
     const pendingBorder: Record<TaskCheckProps["status"], string> = {
-        overdue: "border border-rose-600 bg-rose-500/10 text-rose-600",
-        today: "border border-yellow-600 bg-yellow-500/10 text-yellow-600",
-        due: "border border-emerald-600 bg-emerald-500/10 text-emerald-600",
-        archived: "border border-gray-600 bg-gray-500/10 text-gray-600",
+        overdue: "border " + TaskStatusColor.border[status],
+        today: "border " + TaskStatusColor.border[status] ,
+        due: "border " + TaskStatusColor.border[status] ,
+        archived: "border " + TaskStatusColor.border[status] ,
     }
 
     const style = completed
@@ -37,28 +37,32 @@ export default function TaskCheck({
         : `${baseClass} ${pendingBorder[status]}`
 
     const handleClick = () => {
-        onToggleComplete()
+
         if (!completed) {
             setShowSparkle(true)
             setTimeout(() => setShowSparkle(false), 600)
         }
+        setTimeout(() => onToggleComplete(), 600); // delay the task complete to allow the animation to play
     }
 
     return (
-        <span
-            className={style + " hover:scale-105 hover:shadow-sm"}
+        <div className=" p-2 aspect-square cursor-pointer rounded-full hover:scale-105 hover:shadow-sm transition-all duration-200 ease-in-out"
             onClick={handleClick}
             role="checkbox"
             aria-checked={completed}
             tabIndex={0}
             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleClick()}
         >
-            {completed && <Check size={16} strokeWidth={3} />}
-            {showSparkle && (
-                <span className="absolute -top-6 -right-6 animate-ping text-yellow-400 text-xl pointer-events-none">
-                    ✨
-                </span>
-            )}
-        </span>
+            <span
+                className={style + " border-3"}
+            >
+                {completed && <Check size={16} strokeWidth={3} />}
+                {showSparkle && (
+                    <span className="absolute -top-6 -right-6 animate-ping text-yellow-400 text-xl pointer-events-none">
+                        ✨
+                    </span>
+                )}
+            </span>
+        </div>
     )
 }

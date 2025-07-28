@@ -2,26 +2,21 @@ import { useEffect, useState } from "react";
 
 import "./index.css";
 
-import { AppSpacing, TaskStatusColor, type Task, type TaskStatus } from "./types/types";
+import type { Task, TaskStatus } from "./types/types";
 import TaskList from "./components/TaskList";
 import TaskForm from "./components/TaskForm";
 import FilterBar from "./components/FilterBar";
 import { getTaskStatus, loadTasks, saveTasks } from "./lib/taskServices";
 import DarkModeToggle from "./components/DarkModeToggle";
 import { Button } from "./components/ui/button";
-import { Archive, FlagIcon, Funnel } from "lucide-react";
+import { Funnel } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./components/ui/popover";
 import Badge from "./components/ui/Badge";
-import Logo from "./components/Logo";
-import BadgeCounter from "./components/ui/BadgeCounter";
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>(() => loadTasks());
   const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "completed">("pending");
   const [filterPriority, setFilterPriority] = useState<"all" | "low" | "medium" | "high">("all");
-  const [filterFlagged, setFilterFlagged] = useState<boolean>(false);
-  const [filterStarred, setFilterStarred] = useState<boolean>(false);
-
 
   //Save tasks to localStorage on every change
   useEffect(() => { saveTasks(tasks); }, [tasks]);
@@ -59,14 +54,10 @@ export default function App() {
       (filterStatus === "pending" && !task.completed) ||
       (filterStatus === "completed" && task.completed);
 
-    // const priorityMatch =
-    //   filterPriority === "all" || task.priority === filterPriority;
+    const priorityMatch =
+      filterPriority === "all" || task.priority === filterPriority;
 
-    const flaggedMatch = filterFlagged ? task.flagged : true;
-    const starredMatch = filterStarred ? task.starred : true;
-
-
-    return statusMatch && flaggedMatch && starredMatch;
+    return statusMatch && priorityMatch;
   });
 
   //Sort the tasks based on the status order
@@ -80,32 +71,24 @@ export default function App() {
 
 
   return (
-
-    <div className="pt-8 pb-8 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white transition-all duration-300 ease-in-out">
-      <div id="header" className={"sticky top-8 z-100 items-start flex justify-between " + AppSpacing.padding.horizontal.xl}>
-        <Logo size="md" variant="icon-only" />
-        {/* <div className="bg-white dark:bg-gray-800 shadow rounded-2xl p-6 flex-1 max-w-2xl mx-auto">
-          <TaskForm onAdd={addTask} />
-        </div> */}
-        <div className="min-w-[150px] flex flex-row-reverse"> <DarkModeToggle /></div>
-      </div>
-
-      <div id="form" className={"flex sticky top-0 z-10" + AppSpacing.padding.horizontal.xl}>
-        <TaskForm onAdd={addTask} />
-      </div>
-
+    <div className="bg-gray-300 dark:bg-gray-900 text-gray-900 dark:text-white transition-all duration-300 ease-in-out">
       <div className="min-h-screen p-8 max-w-2xl mx-auto ">
+        <div className="flex justify-between mb-6">
+          <h1 className="text-4xl font-bold">Task Manager 📃</h1>
+          <DarkModeToggle />
+        </div>
+        <div className="bg-white dark:bg-gray-800 shadow rounded-2xl p-6">
+          <TaskForm onAdd={addTask} />
+        </div>
+
+
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mt-4 mb-4">My Tasks</h2>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mt-4 mb-4">My Tasks</h2>
             <Badge variant="outline" text={sortedTasks.length.toString()} />
           </div>
           <Popover>
             <PopoverTrigger><Button variant="secondary"><Funnel /></Button></PopoverTrigger>
-            <div className="divide-x-20">
-              {tasks.filter(task_ => task_.flagged).length > 0 && <BadgeCounter content={tasks.filter(task_ => task_.flagged).length} ><FlagIcon className="w-6 aspect-square" /></BadgeCounter>}
-              <BadgeCounter bgColor={TaskStatusColor.background.archived} textColor="text-white dark:text-black" content={tasks.filter(task_ => task_.archived).length} ><Archive className="w-6 aspect-square" /></BadgeCounter>
-            </div>
             <PopoverContent>
               <FilterBar
                 filterStatus={filterStatus}
@@ -116,13 +99,13 @@ export default function App() {
             </PopoverContent>
           </Popover>
         </div>
-        {/* <div>
+        <div>
 
           {tasks.filter(task => getTaskStatus(task) === "today").length > 0 && <Button variant="ghost">Today<Badge variant="outline" color="yellow" text={tasks.filter(task => getTaskStatus(task) === "today").length.toString()} /></Button>}
           {tasks.filter(task => getTaskStatus(task) === "overdue").length > 0 && <Button variant="ghost">Overdue<Badge variant="outline" color="red" text={tasks.filter(task => getTaskStatus(task) === "overdue").length.toString()} /></Button>}
           <Button variant="ghost">Due<Badge variant="outline" color="green" text={tasks.filter(task => getTaskStatus(task) === "due").length.toString()} /></Button>
           <Button variant="ghost">Archived<Badge variant="outline" color="gray" text={tasks.filter(task => task.archived).length.toString()} /></Button>
-        </div> */}
+        </div>
 
         <TaskList
           tasks={sortedTasks}

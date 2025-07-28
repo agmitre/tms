@@ -32,7 +32,7 @@ export function getTaskStatus(task: Task): TaskStatus {
     const today = new Date();
     const due = new Date(task.dueDate ?? task.createdDate);
     const diff = Math.ceil((due.setHours(0, 0, 0, 0) - today.setHours(0, 0, 0, 0)) / (1000 * 60 * 60 * 24)); // Get day diff only
-    console.log(today+"="+due)
+    console.log(today + "=" + due)
     if (diff < 0) return "overdue";
     if (diff === 0) return "today";
     return "due"
@@ -43,7 +43,7 @@ export function getTaskDateInfo(task: Task): TaskDateInfo {
     const status: TaskStatus = getTaskStatus(task);
 
     const today = new Date();
-    const date = new Date(task.dueDate ?? task.createdDate);
+    const date = new Date(task.dueDate != "" ? task.dueDate : task.createdDate);
     const diffTime = date.getTime() - today.getTime();
     const daysDiff = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 

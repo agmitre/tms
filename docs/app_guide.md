@@ -1,4 +1,3 @@
-//docs/app_guide.md
 # Project Overview
 
 ## Project Description
@@ -83,14 +82,12 @@ This is a task management system application built using React with Vite as the 
   - [x] Add functionality to save and load tasks from local storage.
 
 ## Additional Features Completed
-- [x] A clean filter bar built with shadcn/ui
-- [x] Filtered display of tasks by status and priority
-- [x] A "Clear Filters" button
-- [x] Global badge component for reducing code size
-- [x] LocalStorage integration for testing
-- [x] Implemented a custom taskCheck component.
-- [x] Implemented a magic feedback when task is completed
-- [x] Implemented archive function
+- [x] Created an App icon
+- [x] Modified layout to keep focus on completing tasks
+- [x] Filters moved to the left
+- [x] Header sticky and dynamic on scroll
+- [x] Dynamic logo component
+- [x] Created a custom Task Card
 
 ## New Features Added
 - **Expandable Form**: Add functionality to expand the task creation form when typing starts in the input field.

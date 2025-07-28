@@ -31,7 +31,8 @@ export default function TaskForm({ onAdd }: Props) {
             description: description && description.charAt(0).toUpperCase() + description.slice(1),
             dueDate,
             createdDate: Date.now().toString(),
-            priority,
+            flagged: false,
+            starred: false,
             completed: false,
             archived: false
         };
@@ -84,60 +85,64 @@ export default function TaskForm({ onAdd }: Props) {
     }, []);
 
     return (
-        <form onSubmit={handleSubmit} ref={containerRef} className="transition-all duration-300">
-            <div className="flex gap-2">
-                <Input
-                    ref={titleRef}
-                    type="text"
-                    placeholder="What's your task?"
-                    value={title}
-                    onChange={(e) => {
-                        setTitle(e.target.value);
-                        if (!expanded) setExpanded(true);
-                    }}
+        <div className="  flex-1 max-w-2xl mx-auto cursor-text">
+            <form onSubmit={handleSubmit} ref={containerRef} className="transition-all duration-300">
+                <div className="flex gap-2">
+                    <Input
+                        ref={titleRef}
+                        type="text"
+                        placeholder="What would you like to achieve today?"
+                        className="bg-white font-bold border-none outline-non rounded-full p-8 shadow-xl overflow-hidden transition-all duration-300"
+                        value={title}
+                        onChange={(e) => {
+                            setTitle(e.target.value);
+                            if (!expanded) setExpanded(true);
+                        }}
 
-                />
-                <Button variant="outline" size="icon" onClick={() => setExpanded(!expanded)}>{expanded ? <ChevronsDownUp /> : <ChevronsUpDown />}</Button>
-            </div>
+                    />
+                    {/* <Button variant="outline" size="icon" onClick={() => setExpanded(!expanded)}>{expanded ? <ChevronsDownUp /> : <ChevronsUpDown />}</Button> */}
+                </div>
 
-            {showHelper && !expanded && (
-                <p className="text-sm text-muted-foreground mb-2">Start typing to add a task</p>
-            )}
-            <div
-                className={`pt-2 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden transition-all duration-300 ${expanded ? "max-h-[500px] opacity-100 mt-2" : "max-h-0 opacity-0"
-                    }`}
-            >
-                <Textarea
-                    placeholder="Optional description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="md:col-span-2"
-                />
-                <Input
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                />
-                <Select
-                    value={priority}
-                    onValueChange={(value) =>
-                        setPriority(value as "low" | "medium" | "high")
-                    }
+                {showHelper && !expanded && (
+                    <p className="text-sm text-muted-foreground mb-2">Start typing to add a task</p>
+                )}
+                <div
+                    className={`pt-2 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden transition-all duration-300 ${expanded ? "max-h-[500px] opacity-100 mt-2" : "max-h-0 opacity-0"
+                        }`}
                 >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Priority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="low">Low</SelectItem>
-                    </SelectContent>
-                </Select>
-                <Button type="submit" className="md:col-span-2">
-                    Add Task
-                </Button>
-            </div>
-        </form>
+                    <Textarea
+                        placeholder="Optional description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        className="md:col-span-2"
+                    />
+                    <Input
+                        type="date"
+                        value={dueDate}
+                        onChange={(e) => setDueDate(e.target.value)}
+                    />
+                    <Select
+                        value={priority}
+                        onValueChange={(value) =>
+                            setPriority(value as "low" | "medium" | "high")
+                        }
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Priority" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="high">High</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="low">Low</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Button type="submit" className="md:col-span-2">
+                        Add Task
+                    </Button>
+                </div>
+            </form>
+        </div>
+
     );
 }
 

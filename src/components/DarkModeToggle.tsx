@@ -8,6 +8,7 @@ export default function DarkModeToggle() {
         <Button
             variant="outline"
             size="icon"
+            className="cursor-pointer"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             aria-label="Toggle Dark Mode"
         >
