@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import type { Task } from "../types/types";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { ChevronsDownUp, ChevronsUpDown } from "lucide-react";
+import type { Task } from "@/types/task_models";
+
 
 interface Props {
-    onAdd: (task: Task) => void;
+    onAdd: (input: Partial<Task>) => void;
 }
 
 export default function TaskForm({ onAdd }: Props) {
@@ -24,19 +25,31 @@ export default function TaskForm({ onAdd }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!title.trim()) return;
-        const newTask: Task = {
-            id: Date.now(),
-            title: title.charAt(0).toUpperCase() + title.slice(1),
-            description: description && description.charAt(0).toUpperCase() + description.slice(1),
-            dueDate,
-            createdDate: Date.now().toString(),
-            flagged: false,
-            starred: false,
-            completed: false,
-            archived: false
-        };
-        onAdd(newTask);
+        if (!title.trim()) return; // dallback if no title is set
+        // ✅ Use v02 helper (this auto-adds to Unassigned if no placement given)
+        // Optional: capitalize title/description
+        const cleanTitle = title.trim().charAt(0).toUpperCase() + title.trim().slice(1);
+        const cleanDescription =
+            description?.trim() ? description.trim().charAt(0).toUpperCase() + description.trim().slice(1) : undefined;
+
+        const draft: Partial<Task> = { title: cleanTitle, description: cleanDescription, dueDate: dueDate || undefined }
+        onAdd(draft) //call the add function provided by parent state manager
+
+        // const newTask: Task = {
+        //     id: Date.now(),
+        //     title: title.charAt(0).toUpperCase() + title.slice(1),
+        //     description: description && description.charAt(0).toUpperCase() + description.slice(1),
+        //     dueDate,
+        //     createdDate: Date.now().toString(),
+        //     flagged: false,
+        //     starred: false,
+        //     completed: false,
+        //     archived: false
+        // };
+        // onAdd(newTask);  ----> deprecated for v02
+
+
+        // ✅ Clear form UI state --> reset values
         setTitle("");
         setDescription("");
         setDueDate("");

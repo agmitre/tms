@@ -29,7 +29,7 @@ export default function BadgeCounter({
     const isDot = variant === "dot";
 
     return (
-        <div className="relative inline-block z-10">
+        <div className="relative inline-block">
             {children}
             <span
                 className={clsx(
@@ -40,7 +40,7 @@ export default function BadgeCounter({
                         : "min-w-[1.25rem] h-5 text-xs px-1.5 py-0.5 rounded-full flex items-center justify-center",
                     bgColor,
                     textColor,
-                    "border",
+                    "",
                     borderColor,
                     className
                 )}

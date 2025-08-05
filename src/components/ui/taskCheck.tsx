@@ -1,68 +1,67 @@
 import { useState } from "react"
 import { Check } from "lucide-react"
-import { TaskStatusColor, type TaskStatus } from "@/types/types"
 
-interface TaskCheckProps {
+interface Props {
     completed: boolean
-    status: TaskStatus
     onToggleComplete: () => void
 }
 
 export default function TaskCheck({
     completed,
-    status = "due",
     onToggleComplete,
-}: TaskCheckProps) {
+}: Props) {
     const [showSparkle, setShowSparkle] = useState(false)
 
+    //cta tembok dev hero color: cyan electric #00B2A9
+
     const baseClass =
-        "h-6 w-6 flex items-center justify-center rounded-full transition-all duration-200 cursor-pointer relative"
-
-    const completedBg: Record<TaskCheckProps["status"], string> = {
-        overdue: "bg-rose-500 text-white",
-        today: "bg-yellow-400 text-white",
-        due: "bg-emerald-500 text-white",
-        archived: "bg-gray-500 text-white",
-    }
-
-    const pendingBorder: Record<TaskCheckProps["status"], string> = {
-        overdue: "border " + TaskStatusColor.border[status],
-        today: "border " + TaskStatusColor.border[status] ,
-        due: "border " + TaskStatusColor.border[status] ,
-        archived: "border " + TaskStatusColor.border[status] ,
-    }
-
-    const style = completed
-        ? `${baseClass} ${completedBg[status]}`
-        : `${baseClass} ${pendingBorder[status]}`
+        "text-white dark:text-black h-4 w-4 flex items-center justify-center rounded-full border-3 transition-all duration-200 ease-in-out "
+    const style = `${baseClass} + " "+ ${completed ? "bg-[#00B5E2] border-[#00B5E2]" : "border-[#00B5E2]"}`
 
     const handleClick = () => {
 
         if (!completed) {
             setShowSparkle(true)
-            setTimeout(() => setShowSparkle(false), 600)
+            setTimeout(() => setShowSparkle(false), 800)
         }
-        setTimeout(() => onToggleComplete(), 600); // delay the task complete to allow the animation to play
+
+        // Delay completion to allow animation to play before moving groups
+        setTimeout(() => onToggleComplete(), 600);
     }
 
     return (
-        <div className=" p-2 aspect-square cursor-pointer rounded-full hover:scale-105 hover:shadow-sm transition-all duration-200 ease-in-out"
+        <button
             onClick={handleClick}
             role="checkbox"
             aria-checked={completed}
             tabIndex={0}
             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleClick()}
+            className="relative group h-6 w-6 flex items-center justify-center rounded-full transition-all duration-200 hover:scale-120 active:scale-95 focus:outline-none"
         >
-            <span
-                className={style + " border-3"}
-            >
-                {completed && <Check size={16} strokeWidth={3} />}
-                {showSparkle && (
-                    <span className="absolute -top-6 -right-6 animate-ping text-yellow-400 text-xl pointer-events-none">
-                        ✨
-                    </span>
-                )}
-            </span>
-        </div>
-    )
+            {/* Background Circle */}
+            <div className=" p-1 cursor-pointer">
+                <div
+                    className={`flex items-center justify-center h-full w-full rounded-full border-2 transition-all duration-300 ease-out
+          ${completed ? "bg-cyan-500 border-cyan-500" : "border-cyan-500"}
+        `}
+                >
+                    {
+                        <span className="w-4 h-4 aspect-square rounded-full flex items-center justify-center p-1">
+                            {completed && <Check
+                                strokeWidth={4}
+                                className={"text-white dark:text-black scale-120 transition-all duration-200"}
+                            />}
+                        </span>
+                    }
+                </div>
+            </div>
+
+            {/* Sparkle Animation */}
+            {showSparkle && (
+                <span className="absolute -top-3 -right-3 animate-ping text-yellow-400 text-base pointer-events-none">
+                    ✨
+                </span>
+            )}
+        </button>
+    );
 }

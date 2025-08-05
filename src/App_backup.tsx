@@ -1,118 +1,112 @@
-import { useEffect, useState } from "react";
-
-import "./index.css";
-
-import type { Task, TaskStatus } from "./types/types";
-import TaskList from "./components/TaskList";
-import TaskForm from "./components/TaskForm";
-import FilterBar from "./components/FilterBar";
-import { getTaskStatus, loadTasks, saveTasks } from "./lib/taskServices";
-import DarkModeToggle from "./components/DarkModeToggle";
-import { Button } from "./components/ui/button";
-import { Funnel } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "./components/ui/popover";
-import Badge from "./components/ui/Badge";
+import { useEffect, useState } from "react"
+import { Archive, Circle, CircleCheck, FlagIcon, Funnel } from "lucide-react"
+import { Header } from "./components/Header"
+import BadgeCounter from "./components/ui/BadgeCounter"
+import { Popover, PopoverContent, PopoverTrigger } from "./components/ui/popover"
+import { Button } from "./components/ui/button"
+import { ListMenu } from "./components/ui/ListMenu"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import ScheduleView from "@/components/ScheduleView"
+import { createTask } from "@/lib/task_utility"
+import { nowISO } from "@/lib/global_utility"
+import { type AppStorage, loadStorage, saveStorage, selectors } from "@/lib/task_services"
+import type { Task } from "@/types/task_models"
+import TaskListGrouped from "./components/ui/TaskListGrouped"
+import FilterBar from "./components/FilterBar"
+import { TaskListView } from "./components/TaskListView"
 
 export default function App() {
-  const [tasks, setTasks] = useState<Task[]>(() => loadTasks());
-  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "completed">("pending");
-  const [filterPriority, setFilterPriority] = useState<"all" | "low" | "medium" | "high">("all");
+  const [storage, setStorage] = useState<AppStorage>(() => loadStorage())
+  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "completed">("all")
+  const [filterPriority, setFilterPriority] = useState<"all" | "low" | "medium" | "high">("all")
+  const [filterArchived, setFilterArchived] = useState(false)
+  const [filterFlagged, setFilterFlagged] = useState(false)
+  const [filterStarred, setFilterStarred] = useState(false)
 
-  //Save tasks to localStorage on every change
-  useEffect(() => { saveTasks(tasks); }, [tasks]);
+  const tasks = selectors.tasks(storage)
+  const ledgers = selectors.ledgers(storage)
+  const taskLists = selectors.taskLists(storage)
 
+  useEffect(() => { saveStorage(storage) }, [storage])
 
-  const addTask = (newTask: Task) => {
-    setTasks((prev) => [...prev, newTask]);
-  };
+  const addTask = (newTask: Partial<Task>) => {
+    createTask(storage, newTask)
+    setStorage({ ...storage })
+    saveStorage(storage)
+  }
 
-  const toggleTask = (id: number) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed, archived: !task.completed } : task
-      )
-    );
-  };
+  const toggleTask = (id: string) => {
+    const task = storage.tasks[id]
+    if (!task) return
+    task.completed = !task.completed
+    task.updatedAt = nowISO()
+    setStorage({ ...storage })
+    saveStorage(storage)
+  }
 
-  const archiveTask = (id: number) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id ? { ...task, archived: !task.archived } : task
-      )
-    );
-  };
+  const archiveTask = (id: string) => {
+    const task = storage.tasks[id]
+    if (!task) return
+    task.archived = !task.archived
+    task.updatedAt = nowISO()
+    setStorage({ ...storage })
+    saveStorage(storage)
+  }
 
+  const deleteTask = (id: string) => {
+    if (!storage.tasks[id]) return
+    delete storage.tasks[id]
+    setStorage({ ...storage })
+    saveStorage(storage)
+  }
 
-  const deleteTask = (id: number) => {
-    setTasks((prev) => prev.filter((task) => task.id !== id));
-  };
+  const editTask = (id: string, updates: Partial<Task>) => {
+    const task = storage.tasks[id]
+    if (!task) return
+    Object.assign(task, updates)
+    task.updatedAt = nowISO()
+    setStorage({ ...storage })
+    saveStorage(storage)
+  }
 
-  // Handle filtering
   const filteredTasks = tasks.filter((task) => {
     const statusMatch =
       filterStatus === "all" ||
       (filterStatus === "pending" && !task.completed) ||
-      (filterStatus === "completed" && task.completed);
+      (filterStatus === "completed" && task.completed)
 
-    const priorityMatch =
-      filterPriority === "all" || task.priority === filterPriority;
+    const flaggedMatch = filterFlagged ? task.flagged : true
+    const starredMatch = filterStarred ? task.starred : true
+    const archivedMatch = filterArchived ? task.archived : true
 
-    return statusMatch && priorityMatch;
-  });
-
-  //Sort the tasks based on the status order
-  const statusOrder: TaskStatus[] = ["today", "overdue", "due", "archived"]
-  const sortedTasks = [...filteredTasks].sort((a, b) => {
-    const statusA = getTaskStatus(a);
-    const statusB = getTaskStatus(b);
-    return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB);
-  });
-
-
+    return statusMatch && flaggedMatch && starredMatch && archivedMatch
+  })
 
   return (
-    <div className="bg-gray-300 dark:bg-gray-900 text-gray-900 dark:text-white transition-all duration-300 ease-in-out">
-      <div className="min-h-screen p-8 max-w-2xl mx-auto ">
-        <div className="flex justify-between mb-6">
-          <h1 className="text-4xl font-bold">Task Manager 📃</h1>
-          <DarkModeToggle />
-        </div>
-        <div className="bg-white dark:bg-gray-800 shadow rounded-2xl p-6">
-          <TaskForm onAdd={addTask} />
-        </div>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white transition-all duration-300 ease-in-out">
+      <Header addTask={addTask} />
 
-
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2 items-center">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mt-4 mb-4">My Tasks</h2>
-            <Badge variant="outline" text={sortedTasks.length.toString()} />
+      <main className="grid grid-cols-1 lg:grid-cols-3 gap-4 px-4 pt-4 max-h-[calc(100vh-5rem)]">
+        {/* Left Column - Ledger + Lists */}
+        <ScrollArea className="max-h-[calc(100vh-5rem)] pr-2">
+          <div className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 pt-2 pb-4">
+            <h2 className="text-2xl font-bold">Ledger</h2>
+            <ListMenu items={[{ id: "all", label: "All" }, { id: "work", label: "Work" }, { id: "personal", label: "Personal" }]} />
+            <h2 className="text-2xl font-bold mt-4">Lists</h2>
+            <ListMenu items={[{ id: "all", label: "All Tasks" }, { id: "ideas", label: "Ideas" }]} />
           </div>
-          <Popover>
-            <PopoverTrigger><Button variant="secondary"><Funnel /></Button></PopoverTrigger>
-            <PopoverContent>
-              <FilterBar
-                filterStatus={filterStatus}
-                filterPriority={filterPriority}
-                setFilterStatus={setFilterStatus}
-                setFilterPriority={setFilterPriority}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div>
+        </ScrollArea>
 
-          {tasks.filter(task => getTaskStatus(task) === "today").length > 0 && <Button variant="ghost">Today<Badge variant="outline" color="yellow" text={tasks.filter(task => getTaskStatus(task) === "today").length.toString()} /></Button>}
-          {tasks.filter(task => getTaskStatus(task) === "overdue").length > 0 && <Button variant="ghost">Overdue<Badge variant="outline" color="red" text={tasks.filter(task => getTaskStatus(task) === "overdue").length.toString()} /></Button>}
-          <Button variant="ghost">Due<Badge variant="outline" color="green" text={tasks.filter(task => getTaskStatus(task) === "due").length.toString()} /></Button>
-          <Button variant="ghost">Archived<Badge variant="outline" color="gray" text={tasks.filter(task => task.archived).length.toString()} /></Button>
-        </div>
+        {/* Middle Column - Schedule */}
+        <ScrollArea className="max-h-[calc(100vh-5rem)] pr-2">
+          <ScheduleView tasks={tasks} />
+        </ScrollArea>
 
-        <TaskList
-          tasks={sortedTasks}
-          onToggleComplete={toggleTask}
-          onDelete={deleteTask}
-          onArchive={archiveTask} />
-      </div>
-    </div >
-  );
+        {/* Right Column - Task List */}
+        <ScrollArea className="max-h-[calc(100vh-5rem)] pr-2">
+          <TaskListView tasks={filteredTasks} onToggleComplete={toggleTask} onArchive={archiveTask} onDelete={deleteTask} onEdit={editTask} />
+        </ScrollArea>
+      </main>
+    </div>
+  )
 }

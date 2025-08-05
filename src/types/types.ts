@@ -1,25 +1,10 @@
 // src/types.ts
-// Define a Task Model
-export interface Task {
-    id: number
-    title: string
-    description: string
-    dueDate: string // ISO date
-    createdDate: string // ISO date
-    //priority: 'low' | 'medium' | 'high'
-    flagged: boolean
-    starred: boolean
-    completed: boolean
-    archived: boolean
-}
 
-export interface TaskDateInfo {
-    status: TaskStatus // today, overdue, due, archived
-    daysDiff: number
-    timeframe: string
-}
+//General use types
+export type ISODateString = string;
+export type UUID = string;
 
-export type TaskStatus = "today" | "overdue" | "due" | "archived"
+
 export const TaskStatusColor = {
     text: {
         today: "text-blue-500 dark:text-blue-200",

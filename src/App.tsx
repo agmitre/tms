@@ -1,135 +1,152 @@
-import { useEffect, useState } from "react";
-
-import "./index.css";
-
-import { AppSpacing, TaskStatusColor, type Task, type TaskStatus } from "./types/types";
-import TaskList from "./components/TaskList";
-import TaskForm from "./components/TaskForm";
-import FilterBar from "./components/FilterBar";
-import { getTaskStatus, loadTasks, saveTasks } from "./lib/taskServices";
-import DarkModeToggle from "./components/DarkModeToggle";
-import { Button } from "./components/ui/button";
-import { Archive, FlagIcon, Funnel } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "./components/ui/popover";
-import Badge from "./components/ui/Badge";
-import Logo from "./components/Logo";
-import BadgeCounter from "./components/ui/BadgeCounter";
+import { useEffect, useState } from "react"
+import { Header } from "./components/Header"
+import { ListMenu } from "./components/ui/ListMenu"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import ScheduleView from "@/components/ScheduleView"
+import { createTask } from "@/lib/task_utility"
+import { nowISO } from "@/lib/global_utility"
+import { type AppStorage, loadStorage, saveStorage, selectors } from "@/lib/task_services"
+import type { Task } from "@/types/task_models"
+import { TaskListView } from "./components/TaskListView"
+import { SideBarView } from "./components/sideBarView"
+import { TopBarView } from "./components/topBarView"
+import { cn } from "./lib/utils"
 
 export default function App() {
-  const [tasks, setTasks] = useState<Task[]>(() => loadTasks());
-  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "completed">("pending");
-  const [filterPriority, setFilterPriority] = useState<"all" | "low" | "medium" | "high">("all");
-  const [filterFlagged, setFilterFlagged] = useState<boolean>(false);
-  const [filterStarred, setFilterStarred] = useState<boolean>(false);
+  const [storage, setStorage] = useState<AppStorage>(() => loadStorage())
+  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "completed">("all")
+  const [filterPriority, setFilterPriority] = useState<"all" | "low" | "medium" | "high">("all")
+  const [filterArchived, setFilterArchived] = useState(false)
+  const [filterFlagged, setFilterFlagged] = useState(false)
+  const [filterStarred, setFilterStarred] = useState(false)
 
+  const tasks = selectors.tasks(storage)
+  const ledgers = selectors.ledgers(storage)
+  const taskLists = selectors.taskLists(storage)
 
-  //Save tasks to localStorage on every change
-  useEffect(() => { saveTasks(tasks); }, [tasks]);
+  useEffect(() => { saveStorage(storage) }, [storage])
 
+  const addTask = (newTask: Partial<Task>) => {
+    createTask(storage, newTask)
+    setStorage({ ...storage })
+    saveStorage(storage)
+  }
 
-  const addTask = (newTask: Task) => {
-    setTasks((prev) => [...prev, newTask]);
-  };
+  const toggleTask = (id: string) => {
+    const task = storage.tasks[id]
+    if (!task) return
+    task.completed = !task.completed
+    task.updatedAt = nowISO()
+    setStorage({ ...storage })
+    saveStorage(storage)
+  }
 
-  const toggleTask = (id: number) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed, archived: !task.completed } : task
-      )
-    );
-  };
+  const archiveTask = (id: string) => {
+    const task = storage.tasks[id]
+    if (!task) return
+    task.archived = !task.archived
+    task.updatedAt = nowISO()
+    setStorage({ ...storage })
+    saveStorage(storage)
+  }
 
-  const archiveTask = (id: number) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id ? { ...task, archived: !task.archived } : task
-      )
-    );
-  };
+  const deleteTask = (id: string) => {
+    if (!storage.tasks[id]) return
+    delete storage.tasks[id]
+    setStorage({ ...storage })
+    saveStorage(storage)
+  }
 
+  const editTask = (id: string, updates: Partial<Task>) => {
+    const task = storage.tasks[id]
+    if (!task) return
+    Object.assign(task, updates)
+    task.updatedAt = nowISO()
+    setStorage({ ...storage })
+    saveStorage(storage)
+  }
 
-  const deleteTask = (id: number) => {
-    setTasks((prev) => prev.filter((task) => task.id !== id));
-  };
-
-  // Handle filtering
   const filteredTasks = tasks.filter((task) => {
     const statusMatch =
       filterStatus === "all" ||
       (filterStatus === "pending" && !task.completed) ||
-      (filterStatus === "completed" && task.completed);
+      (filterStatus === "completed" && task.completed)
 
-    // const priorityMatch =
-    //   filterPriority === "all" || task.priority === filterPriority;
+    const flaggedMatch = filterFlagged ? task.flagged : true
+    const starredMatch = filterStarred ? task.starred : true
+    const archivedMatch = filterArchived ? task.archived : true
 
-    const flaggedMatch = filterFlagged ? task.flagged : true;
-    const starredMatch = filterStarred ? task.starred : true;
+    return statusMatch && flaggedMatch && starredMatch && archivedMatch
+  })
 
+  //============ responsive design handlers
+  const [isSmallScreen, setIsSmallScreen] = useState(false)
+  const [showRightSidebar, setShowRightSidebar] = useState(true)
 
-    return statusMatch && flaggedMatch && starredMatch;
-  });
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 1024) // lg breakpoint
+    }
 
-  //Sort the tasks based on the status order
-  const statusOrder: TaskStatus[] = ["today", "overdue", "due", "archived"]
-  const sortedTasks = [...filteredTasks].sort((a, b) => {
-    const statusA = getTaskStatus(a);
-    const statusB = getTaskStatus(b);
-    return statusOrder.indexOf(statusA) - statusOrder.indexOf(statusB);
-  });
-
-
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
 
   return (
+    <div id="app-container" className={cn(
+      "min-h-screen w-screen",
+      " bg-gray-100 dark:bg-gray-900",
+      "text-gray-900 dark:text-white",
+      "transition-all duration-300 ease-in-out"
 
-    <div className="pt-8 pb-8 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white transition-all duration-300 ease-in-out">
-      <div id="header" className={"sticky top-8 z-100 items-start flex justify-between " + AppSpacing.padding.horizontal.xl}>
-        <Logo size="md" variant="icon-only" />
-        {/* <div className="bg-white dark:bg-gray-800 shadow rounded-2xl p-6 flex-1 max-w-2xl mx-auto">
-          <TaskForm onAdd={addTask} />
-        </div> */}
-        <div className="min-w-[150px] flex flex-row-reverse"> <DarkModeToggle /></div>
-      </div>
+    )}>
+      <div className="flex flex-col h-full gap-4">
 
-      <div id="form" className={"flex sticky top-0 z-10" + AppSpacing.padding.horizontal.xl}>
-        <TaskForm onAdd={addTask} />
-      </div>
-
-      <div className="min-h-screen p-8 max-w-2xl mx-auto ">
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2 items-center">
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mt-4 mb-4">My Tasks</h2>
-            <Badge variant="outline" text={sortedTasks.length.toString()} />
+        {/* Top Bar - only for small screens */}
+        {isSmallScreen && (
+          <div className="w-full h-16 flex items-center justify-center sticky top-0 z-100">
+            <TopBarView />
           </div>
-          <Popover>
-            <PopoverTrigger><Button variant="secondary"><Funnel /></Button></PopoverTrigger>
-            <div className="divide-x-20">
-              {tasks.filter(task_ => task_.flagged).length > 0 && <BadgeCounter content={tasks.filter(task_ => task_.flagged).length} ><FlagIcon className="w-6 aspect-square" /></BadgeCounter>}
-              <BadgeCounter bgColor={TaskStatusColor.background.archived} textColor="text-white dark:text-black" content={tasks.filter(task_ => task_.archived).length} ><Archive className="w-6 aspect-square" /></BadgeCounter>
-            </div>
-            <PopoverContent>
-              <FilterBar
-                filterStatus={filterStatus}
-                filterPriority={filterPriority}
-                setFilterStatus={setFilterStatus}
-                setFilterPriority={setFilterPriority}
-              />
-            </PopoverContent>
-          </Popover>
+        )}
+
+        <div className="flex flex-1 gap-12">
+
+          {/* Left Sidebar - hidden on small screens */}
+          {!isSmallScreen && (
+            <aside className={cn(
+              "flex flex-col items-center pl-8 sticky top-0 z-100",
+              "max-w-[140px] min-w-[80px]")
+            }>
+              <SideBarView />
+            </aside>
+          )}
+
+          {/* Center Content */}
+          <main className="flex-1 min-w-0 rounded-md p-4 overflow-y-auto">
+            <ScheduleView tasks={tasks} />
+          </main>
+
+          {/* Right Sidebar - visible and toggleable */}
+          <aside
+            className={
+              cn(
+                "transition-all duration-300 ease-in-out overflow-auto",
+                showRightSidebar ? (isSmallScreen ? "max-w-sm" : "max-w-md")
+                  : "w-full"
+              )}
+          >
+            {showRightSidebar && (
+              <div className="h-full p-4">
+                <ScrollArea className="max-h-[calc(100vh-5rem)] pr-2">
+                  <TaskListView tasks={filteredTasks} onToggleComplete={toggleTask} onArchive={archiveTask} onDelete={deleteTask} onEdit={editTask} />
+                </ScrollArea>
+              </div>
+            )}
+          </aside>
+
         </div>
-        {/* <div>
-
-          {tasks.filter(task => getTaskStatus(task) === "today").length > 0 && <Button variant="ghost">Today<Badge variant="outline" color="yellow" text={tasks.filter(task => getTaskStatus(task) === "today").length.toString()} /></Button>}
-          {tasks.filter(task => getTaskStatus(task) === "overdue").length > 0 && <Button variant="ghost">Overdue<Badge variant="outline" color="red" text={tasks.filter(task => getTaskStatus(task) === "overdue").length.toString()} /></Button>}
-          <Button variant="ghost">Due<Badge variant="outline" color="green" text={tasks.filter(task => getTaskStatus(task) === "due").length.toString()} /></Button>
-          <Button variant="ghost">Archived<Badge variant="outline" color="gray" text={tasks.filter(task => task.archived).length.toString()} /></Button>
-        </div> */}
-
-        <TaskList
-          tasks={sortedTasks}
-          onToggleComplete={toggleTask}
-          onDelete={deleteTask}
-          onArchive={archiveTask} />
       </div>
-    </div >
-  );
+    </div>
+  )
 }

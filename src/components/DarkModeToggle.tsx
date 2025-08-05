@@ -14,9 +14,9 @@ export default function DarkModeToggle() {
         >
             {
                 theme === "dark" ? (
-                    <Sun className="h-4 w-4" />
+                    <Sun className="h-6 w-6" />
                 ) : (
-                    <Moon className="h-4 w-4" />
+                    <Moon className="h-6 w-6" />
                 )
 
             }
